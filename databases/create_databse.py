@@ -10,14 +10,27 @@ def stworz_baze_danych(nazwa_bazy="maindb.db"):
             print(f"Baza danych '{nazwa_bazy}' została pomyślnie utworzona/otwarta.")
             cursor = conn.cursor()
             cursor.execute('''
-                CREATE TABLE IF NOT EXISTS przyklady (
+                CREATE TABLE IF NOT EXISTS users (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    nazwa TEXT NOT NULL,
-                    wartosc REAL
+                    username TEXT NOT NULL UNIQUE,
+                    password TEXT NOT NULL
                 )
             ''')
+            print("Tabela 'users' została utworzona (jeśli nie istniała).")
+
+            cursor.execute('''
+                CREATE TABLE IF NOT EXISTS portfolios (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    user_id INTEGER NOT NULL,
+                    asset_name TEXT NOT NULL,
+                    asset_type TEXT NOT NULL,
+                    quantity REAL NOT NULL,
+                    FOREIGN KEY (user_id) REFERENCES users(id)
+                )
+            ''')
+            print("Tabela 'portfolios' została utworzona (jeśli nie istniała).")
+
             conn.commit()
-            print("Tabela 'przyklady' została utworzona (jeśli nie istniała).")
 
     except sqlite3.Error as e:
         print(f"Wystąpił błąd SQLite: {e}")

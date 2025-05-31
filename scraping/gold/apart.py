@@ -5,13 +5,15 @@ import datetime
 import time
 import os
 import re
-DB_NAME = "C:/Users/maciej.pal/OneDrive - Customs Support/Dokumenty/GitHub/projekt/databases/maindb.db"
+DB_NAME = "maindb.db"
 TABLE_NAME_APART = "ceny_skupu_apart"
 URL_APART_SKUP = "https://mennica.apart.pl/skup"
 
 def get_db_path():
     script_dir = os.path.dirname(os.path.abspath(__file__))
-    return os.path.join(script_dir, DB_NAME)
+    # Go up two directories to the project root, then into 'databases'
+    project_root = os.path.abspath(os.path.join(script_dir, '..', '..'))
+    return os.path.join(project_root, 'databases', DB_NAME)
 
 def create_apart_purchase_prices_table(db_path):
     conn = None

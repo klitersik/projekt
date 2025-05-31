@@ -4,7 +4,7 @@ import datetime
 import time
 import os
 
-DB_NAME = "C:/Users/maciej.pal/OneDrive - Customs Support/Dokumenty/GitHub/projekt/databases/maindb.db"
+DB_NAME = "maindb.db"
 TABLE_NAME_YFINANCE = "yfinance_stock_data"
 
 POPULAR_TICKERS = [
@@ -12,13 +12,15 @@ POPULAR_TICKERS = [
     "V", "JNJ", "WMT", "PG", "MA", "UNH", "HD", "BAC", "DIS", "PYPL",
     "NFLX", "ADBE", "CRM", "PFE", "KO", "XOM", "CVX", "MCD", "NKE", "INTC",
     "CSCO", "PEP", "COST", "AVGO", "ABBV", "TMO", "ACN", "LLY", "MRK", "ORCL",
-]
+] # Added trailing comma and ensured correct closing bracket
 DEMO_TICKERS = POPULAR_TICKERS[:15]
 
 def get_db_path():
     """Zwraca pełną ścieżkę do pliku bazy danych."""
     script_dir = os.path.dirname(os.path.abspath(__file__))
-    return os.path.join(script_dir, DB_NAME)
+    # Go up two directories to the project root, then into 'databases'
+    project_root = os.path.abspath(os.path.join(script_dir, '..', '..'))
+    return os.path.join(project_root, 'databases', DB_NAME)
 
 def create_yfinance_table(db_path):
     """Tworzy tabelę dla danych z yfinance, jeśli jeszcze nie istnieje."""

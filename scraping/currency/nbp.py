@@ -5,12 +5,14 @@ import time
 import os
 import json
 
-DB_NAME = "C:/Users/maciej.pal/OneDrive - Customs Support/Dokumenty/GitHub/projekt/databases/maindb.db"
+DB_NAME = "maindb.db"
 TABLE_NAME_NBP = "kursy_walut_nbp"
 
 def get_db_path():
     script_dir = os.path.dirname(os.path.abspath(__file__))
-    return os.path.join(script_dir, DB_NAME)
+    # Go up two directories to the project root, then into 'databases'
+    project_root = os.path.abspath(os.path.join(script_dir, '..', '..'))
+    return os.path.join(project_root, 'databases', DB_NAME)
 
 def create_nbp_currency_table(db_path):
     conn = None
