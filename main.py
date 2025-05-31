@@ -297,7 +297,7 @@ def main(page: ft.Page):
             width=300
         )
         asset_selection_dropdown = ft.Dropdown(
-            label="Wybierz Aktyw",
+            label="Wybierz Aktywo",
             width=300,
             options=[]
         )
