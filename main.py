@@ -6,25 +6,20 @@ import datetime
 
 DATABASE_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'databases', 'maindb.db')
 
-# Define paths to scraper databases
 NBP_DB_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'databases', 'maindb.db')
 APART_DB_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'databases', 'maindb.db')
 YFINANCE_DB_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'databases', 'maindb.db')
 
-# Define table names
 TABLE_NAME_NBP = "kursy_walut_nbp"
 TABLE_NAME_APART = "ceny_skupu_apart"
 TABLE_NAME_YFINANCE = "yfinance_stock_data"
 
-# Default price for currencies (4 PLN as requested)
 DEFAULT_CURRENCY_PRICE = 4.0
 
 def init_database():
-    """Initialize database with required tables"""
     conn = sqlite3.connect(DATABASE_PATH)
     cursor = conn.cursor()
     
-    # Create users table
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS users (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -33,7 +28,6 @@ def init_database():
         )
     ''')
     
-    # Create portfolios table
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS portfolios (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -49,7 +43,6 @@ def init_database():
     conn.close()
 
 def get_db_connection():
-    # Ensure database directory exists
     os.makedirs(os.path.dirname(DATABASE_PATH), exist_ok=True)
     init_database()
     conn = sqlite3.connect(DATABASE_PATH)
@@ -106,11 +99,9 @@ def get_user_portfolio(user_id):
     return assets
 
 def get_asset_price(asset_name, asset_type):
-    """Get current price for an asset with fallback to default values"""
     price = 0
     
     if asset_type == 'currency':
-        # Use default price of 4 PLN for all currencies as requested
         price = DEFAULT_CURRENCY_PRICE
         
     elif asset_type == 'gold':
@@ -122,9 +113,9 @@ def get_asset_price(asset_name, asset_type):
             if result:
                 price = result[0]
             else:
-                price = 200.0  # Default gold price if no data
+                price = 200.0
         except sqlite3.Error:
-            price = 200.0  # Default fallback
+            price = 200.0
         finally:
             if 'conn' in locals():
                 conn.close()
@@ -138,9 +129,9 @@ def get_asset_price(asset_name, asset_type):
             if result:
                 price = result[0]
             else:
-                price = 100.0  # Default stock price if no data
+                price = 100.0
         except sqlite3.Error:
-            price = 100.0  # Default fallback
+            price = 100.0
         finally:
             if 'conn' in locals():
                 conn.close()
@@ -160,12 +151,10 @@ def get_portfolio_value_and_categories(user_id):
     for asset in assets:
         current_price = get_asset_price(asset['asset_name'], asset['asset_type'])
         asset_value = asset['quantity'] * current_price
-        
-        # Add to category totals
+
         category_values[asset['asset_type']] += asset_value
         total_portfolio_value += asset_value
-        
-        # Add to category lists
+
         assets_by_category[asset['asset_type']].append({
             "name": asset['asset_name'],
             "quantity": asset['quantity'],
@@ -176,7 +165,6 @@ def get_portfolio_value_and_categories(user_id):
     return total_portfolio_value, category_values, assets_by_category
 
 def get_available_currencies():
-    """Return some common currencies as fallback"""
     try:
         conn = sqlite3.connect(NBP_DB_PATH)
         cursor = conn.cursor()
@@ -190,7 +178,6 @@ def get_available_currencies():
         if 'conn' in locals():
             conn.close()
     
-    # Fallback to common currencies
     return ["USD", "EUR", "GBP", "CHF", "JPY", "CAD", "AUD"]
 
 def get_available_gold_products():
@@ -207,7 +194,6 @@ def get_available_gold_products():
         if 'conn' in locals():
             conn.close()
     
-    # Fallback to common gold products
     return ["1oz Gold Coin", "10g Gold Bar", "1g Gold Bar"]
 
 def get_available_stock_tickers():
@@ -224,11 +210,10 @@ def get_available_stock_tickers():
         if 'conn' in locals():
             conn.close()
     
-    # Fallback to common stock tickers
     return ["AAPL", "GOOGL", "MSFT", "TSLA", "AMZN", "META", "NVDA"]
 
 def main(page: ft.Page):
-    page.title = "Aplikacja do zarządzania portfolio"
+    page.title = "INVESTMENT - Aplikacja do zarządzania portfolio"
     page.vertical_alignment = ft.MainAxisAlignment.CENTER
     page.horizontal_alignment = ft.CrossAxisAlignment.CENTER
     page.window.width = 900
@@ -384,8 +369,7 @@ def main(page: ft.Page):
             category_names = {"currency": "💰 Waluty", "gold": "🥇 Złoto", "stock": "📈 Akcje"}
             
             for category, assets in assets_by_category.items():
-                if assets:  # Only show categories that have assets
-                    # Category header
+                if assets:
                     details.append(
                         ft.Container(
                             content=ft.Text(
@@ -398,7 +382,6 @@ def main(page: ft.Page):
                         )
                     )
                     
-                    # Assets in this category
                     for asset in assets:
                         details.append(
                             ft.Container(
@@ -478,17 +461,14 @@ def main(page: ft.Page):
             success, message = add_asset_to_portfolio_db(current_user_id, asset_name, asset_type, quantity)
             if success:
                 show_message(message)
-                # Clear form
                 asset_selection_dropdown.value = None
                 quantity_field.value = ""
                 asset_type_dropdown.value = None
                 asset_selection_dropdown.options.clear()
-                # Update display
                 update_portfolio_display()
             else:
                 show_message(message, ft.Colors.RED_500)
 
-        # Initial display update
         update_portfolio_display()
 
         return ft.Column(
@@ -505,17 +485,16 @@ def main(page: ft.Page):
                     padding=ft.padding.only(bottom=20)
                 ),
                 
-                # Add asset section
                 ft.Container(
                     content=ft.Column([
-                        ft.Text("➕ Dodaj nowy aktyw", size=18, weight=ft.FontWeight.BOLD),
+                        ft.Text("➕ Dodaj nowe aktywo", size=18, weight=ft.FontWeight.BOLD),
                         ft.Row([
                             asset_type_dropdown,
                             asset_selection_dropdown,
                             quantity_field,
                         ], alignment=ft.MainAxisAlignment.CENTER),
                         ft.ElevatedButton(
-                            "Dodaj Aktyw", 
+                            "Dodaj Aktywo", 
                             on_click=on_add_asset_click,
                             style=ft.ButtonStyle(
                                 bgcolor=ft.Colors.BLUE_600,
@@ -529,13 +508,10 @@ def main(page: ft.Page):
                     margin=ft.margin.only(bottom=20)
                 ),
                 
-                # Portfolio value
                 total_value_text,
                 ft.Container(height=20),
                 
-                # Charts and details in a row
                 ft.Row([
-                    # Pie chart
                     ft.Container(
                         content=ft.Column([
                             ft.Text("📊 Struktura Portfolio", size=16, weight=ft.FontWeight.BOLD),
@@ -545,7 +521,6 @@ def main(page: ft.Page):
                         padding=20
                     ),
                     
-                    # Portfolio details
                     ft.Container(
                         content=ft.Column([
                             ft.Text("📋 Szczegóły Portfolio", size=16, weight=ft.FontWeight.BOLD),
